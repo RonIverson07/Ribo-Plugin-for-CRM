@@ -89,15 +89,16 @@
 .ribo-form-wrap.ribo-form-wrap .ribo-submit,.ribo-form-wrap.ribo-form-wrap .ribo-status{flex:0 0 100%;max-width:100%}
 .ribo-form-wrap.ribo-form-wrap .ribo-status{margin-top:10px;font-size:13px;opacity:.9}
 
-.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout{width:100%}
-.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-form{display:block}
-.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-form-stage{position:relative;width:100%;overflow:visible}
-.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-field{position:absolute;box-sizing:border-box;margin:0;display:flex;flex-direction:column}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout{width:100%; position: relative; min-height: 200px;}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-form{display:block; position: relative; width: 100%;}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-form-stage{position:relative;width:100%;overflow:visible; min-height: inherit;}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-field{position:absolute;box-sizing:border-box;margin:0;display:flex;flex-direction:column; overflow: visible;}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-field label { word-wrap: break-word; overflow-wrap: break-word; }
 .ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-field > input:not([type="checkbox"]):not([type="radio"]),
 .ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-field > textarea,
-.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-field > select{width:100%;max-width:100%;min-width:0;align-self:stretch}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-field > select{width:100%;max-width:100%;min-width:0;align-self:stretch; flex: 1 1 auto; box-sizing: border-box;}
 .ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-field > textarea{resize:none}
 .ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-submit,
-.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-status{display:block;width:100%;max-width:100%}
-.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-submit{margin-top:12px}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-status{display:block;width:100%;max-width:100%; position: relative;}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-submit{margin-top:12px; clear: both;}
 .ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-status{margin-top:10px}

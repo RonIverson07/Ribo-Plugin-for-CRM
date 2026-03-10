@@ -1,175 +1,237 @@
 <?php
-if (!defined('ABSPATH')) { exit; }
+if (!defined('ABSPATH')) {
+  exit;
+}
 
-class RIBO_Shortcode {
-    public static function init() {
-        add_shortcode('ribo_form', [__CLASS__, 'render']);
-        add_action('wp_enqueue_scripts', [__CLASS__, 'register_assets']);
+class RIBO_Shortcode
+{
+  public static function init()
+  {
+    add_shortcode('ribo_form', [__CLASS__, 'render']);
+    add_action('wp_enqueue_scripts', [__CLASS__, 'register_assets']);
+  }
+
+  public static function register_assets()
+  {
+    wp_register_style('ribo-form-css', RIBO_WP_INBOUND_URL . 'public/assets/form.css', [], RIBO_WP_INBOUND_VERSION);
+    wp_register_script('ribo-form-js', RIBO_WP_INBOUND_URL . 'public/assets/form.js', [], RIBO_WP_INBOUND_VERSION, true);
+  }
+
+  public static function render($atts)
+  {
+    $atts = shortcode_atts(['id' => ''], $atts, 'ribo_form');
+    $form_id = sanitize_text_field($atts['id']);
+    if (!$form_id) {
+      return '<!-- ribo_form: missing id -->';
     }
 
-    public static function register_assets() {
-        wp_register_style('ribo-form-css', RIBO_WP_INBOUND_URL . 'public/assets/form.css', [], RIBO_WP_INBOUND_VERSION);
-        wp_register_script('ribo-form-js', RIBO_WP_INBOUND_URL . 'public/assets/form.js', [], RIBO_WP_INBOUND_VERSION, true);
+    $form = RIBO_DB::get_form($form_id);
+    if (!$form || $form['status'] !== 'published') {
+      return '<!-- ribo_form: not found -->';
     }
 
-    public static function render($atts) {
-        $atts = shortcode_atts(['id' => ''], $atts, 'ribo_form');
-        $form_id = sanitize_text_field($atts['id']);
-        if (!$form_id) { return '<!-- ribo_form: missing id -->'; }
+    $schema = json_decode($form['schema_json'], true);
+    if (!is_array($schema)) {
+      return '<!-- ribo_form: invalid schema -->';
+    }
+    $schema = RIBO_DB::normalize_schema($schema, [
+      'id' => $form['id'],
+      'name' => $form['name'],
+      'status' => $form['status'],
+    ]);
 
-        $form = RIBO_DB::get_form($form_id);
-        if (!$form || $form['status'] !== 'published') { return '<!-- ribo_form: not found -->'; }
+    return self::render_schema($schema);
+  }
 
-        $schema = json_decode($form['schema_json'], true);
-        if (!is_array($schema)) { return '<!-- ribo_form: invalid schema -->'; }
-        $schema = RIBO_DB::normalize_schema($schema, [
-            'id' => $form['id'],
-            'name' => $form['name'],
-            'status' => $form['status'],
-        ]);
-
-        return self::render_schema($schema);
+  public static function render_schema($schema)
+  {
+    if (!is_array($schema)) {
+      return '<!-- ribo_form: invalid schema -->';
     }
 
-    public static function render_schema($schema) {
-        if (!is_array($schema)) { return '<!-- ribo_form: invalid schema -->'; }
+    $form_id = sanitize_text_field($schema['id'] ?? '');
+    $fields = isset($schema['fields']) && is_array($schema['fields']) ? $schema['fields'] : [];
+    $ui = isset($schema['ui']) && is_array($schema['ui']) ? $schema['ui'] : [];
+    $submit_text = isset($ui['submit_text']) ? sanitize_text_field($ui['submit_text']) : 'Send';
+    $base_width = isset($ui['canvas_width']) ? floatval($ui['canvas_width']) : 0;
+    if ($base_width < 320) {
+      $base_width = 720;
+    }
+    $stage_height = isset($ui['canvas_height']) ? floatval($ui['canvas_height']) : 0;
+    if ($stage_height < 240) {
+      $stage_height = 240;
+    }
 
-        $form_id = sanitize_text_field($schema['id'] ?? '');
-        $fields = isset($schema['fields']) && is_array($schema['fields']) ? $schema['fields'] : [];
-        $ui = isset($schema['ui']) && is_array($schema['ui']) ? $schema['ui'] : [];
-        $submit_text = isset($ui['submit_text']) ? sanitize_text_field($ui['submit_text']) : 'Send';
-        $base_width = isset($ui['canvas_width']) ? floatval($ui['canvas_width']) : 0;
-        if ($base_width < 320) { $base_width = 720; }
-        $stage_height = isset($ui['canvas_height']) ? floatval($ui['canvas_height']) : 0;
-        if ($stage_height < 240) { $stage_height = 240; }
+    foreach ($fields as $layout_field) {
+      $layout_type = sanitize_text_field($layout_field['type'] ?? 'text');
+      if ($layout_type === 'hidden') {
+        continue;
+      }
+      $layout_settings = isset($layout_field['settings']) && is_array($layout_field['settings']) ? $layout_field['settings'] : [];
+      $layout_top = isset($layout_settings['canvas_y']) ? floatval($layout_settings['canvas_y']) : 0;
+      if ($layout_top < 0)
+        $layout_top = 0;
 
-        foreach ($fields as $layout_field) {
-            $layout_type = sanitize_text_field($layout_field['type'] ?? 'text');
-            if ($layout_type === 'hidden') { continue; }
-            $layout_settings = isset($layout_field['settings']) && is_array($layout_field['settings']) ? $layout_field['settings'] : [];
-            $layout_top = isset($layout_settings['canvas_y']) ? floatval($layout_settings['canvas_y']) : 0;
-            if ($layout_top < 0) $layout_top = 0;
-            $layout_height = 0;
-            if (isset($layout_settings['height'])) {
-                $layout_height = floatval($layout_settings['height']);
-            } elseif (isset($layout_settings['box_height'])) {
-                $layout_height = floatval($layout_settings['box_height']);
-            }
-            if ($layout_height <= 0) { $layout_height = 86; }
-            $stage_height = max($stage_height, $layout_top + $layout_height + 12);
-        }
+      $layout_height = 0;
+      if (isset($layout_settings['height'])) {
+        $layout_height = floatval($layout_settings['height']);
+      }
+      elseif (isset($layout_settings['box_height'])) {
+        $layout_height = floatval($layout_settings['box_height']);
+      }
 
-        wp_enqueue_style('ribo-form-css');
-        wp_enqueue_script('ribo-form-js');
+      // If there's a label, we should add some padding for it if the height is small
+      $has_label = !empty($layout_field['label']);
+      if ($layout_height <= 0) {
+        $layout_height = $has_label ? 92 : 64;
+      }
 
-        // We only localize if we have a form_id. If it's a real-time preview (no ID yet), we might need to handle it.
-        if ($form_id) {
-            wp_localize_script('ribo-form-js', 'RIBO_FORM', [
-                'restUrl' => esc_url_raw(rest_url('ribo/v1/forms/' . $form_id . '/submit')),
-                'nonce' => wp_create_nonce('wp_rest')
-            ]);
-        }
+      $stage_height = max($stage_height, $layout_top + $layout_height);
+    }
 
-        ob_start();
-        ?>
+    // Add a 40px buffer at the bottom of the stage
+    $stage_height += 40;
+
+    wp_enqueue_style('ribo-form-css');
+    wp_enqueue_script('ribo-form-js');
+
+    // We only localize if we have a form_id. If it's a real-time preview (no ID yet), we might need to handle it.
+    if ($form_id) {
+      wp_localize_script('ribo-form-js', 'RIBO_FORM', [
+        'restUrl' => esc_url_raw(rest_url('ribo/v1/forms/' . $form_id . '/submit')),
+        'nonce' => wp_create_nonce('wp_rest')
+      ]);
+    }
+
+    ob_start();
+?>
         <div class="ribo-form-wrap ribo-form-wrap--layout" data-form-id="<?php echo esc_attr($form_id); ?>" data-canvas-width="<?php echo esc_attr(round($base_width, 1)); ?>" style="width:100%; max-width:100%;">
           <form class="ribo-form ribo-form--layout" novalidate>
             <input type="hidden" name="_page_url" value="<?php echo esc_url(get_permalink()); ?>">
             <div class="ribo-form-stage" style="min-height:<?php echo esc_attr(round($stage_height, 1)); ?>px;">
             <?php foreach ($fields as $f):
-                $fid = sanitize_text_field($f['id'] ?? '');
-                if (!$fid) continue;
+      $fid = sanitize_text_field($f['id'] ?? '');
+      if (!$fid)
+        continue;
 
-                $type = sanitize_text_field($f['type'] ?? 'text');
-                $label = sanitize_text_field($f['label'] ?? '');
-                $required = !empty($f['required']);
-                $settings = isset($f['settings']) && is_array($f['settings']) ? $f['settings'] : [];
-                $ph = sanitize_text_field($settings['placeholder'] ?? '');
-                $default_value = isset($settings['default_value']) ? sanitize_text_field($settings['default_value']) : '';
+      $type = sanitize_text_field($f['type'] ?? 'text');
+      $label = sanitize_text_field($f['label'] ?? '');
+      $required = !empty($f['required']);
+      $settings = isset($f['settings']) && is_array($f['settings']) ? $f['settings'] : [];
+      $ph = sanitize_text_field($settings['placeholder'] ?? '');
+      $default_value = isset($settings['default_value']) ? sanitize_text_field($settings['default_value']) : '';
 
-                if ($type === 'hidden') {
-                    ?>
+      if ($type === 'hidden') {
+?>
                     <input id="<?php echo esc_attr($fid); ?>" type="hidden" name="<?php echo esc_attr($fid); ?>" value="<?php echo esc_attr($default_value); ?>">
                     <?php
-                    continue;
-                }
+        continue;
+      }
 
-                $width_units = isset($f['width']) ? floatval($f['width']) : 12.0;
-                if ($width_units < 1) $width_units = 1;
-                if ($width_units > 12) $width_units = 12;
-                $width_units = round($width_units, 1);
-                $width_px = max(120, ($width_units / 12.0) * $base_width);
-                $width_pct = round(($width_px / max(1, $base_width)) * 100.0, 4);
-                $left_px = isset($settings['canvas_x']) ? floatval($settings['canvas_x']) : 0;
-                if ($left_px < 0) $left_px = 0;
-                $left_pct = round(($left_px / max(1, $base_width)) * 100.0, 4);
-                $top_px = isset($settings['canvas_y']) ? floatval($settings['canvas_y']) : 0;
-                if ($top_px < 0) $top_px = 0;
+      $width_units = isset($f['width']) ? floatval($f['width']) : 12.0;
+      if ($width_units < 1)
+        $width_units = 1;
+      if ($width_units > 12)
+        $width_units = 12;
+      $width_units = round($width_units, 1);
+      $width_px = max(120, ($width_units / 12.0) * $base_width);
+      $width_pct = round(($width_px / max(1, $base_width)) * 100.0, 4);
+      $left_px = isset($settings['canvas_x']) ? floatval($settings['canvas_x']) : 0;
+      if ($left_px < 0)
+        $left_px = 0;
+      $left_pct = round(($left_px / max(1, $base_width)) * 100.0, 4);
+      $top_px = isset($settings['canvas_y']) ? floatval($settings['canvas_y']) : 0;
+      if ($top_px < 0)
+        $top_px = 0;
 
-                $height_px = 0;
-                if (isset($settings['height'])) {
-                    $height_px = floatval($settings['height']);
-                } elseif (isset($settings['box_height'])) {
-                    $height_px = floatval($settings['box_height']);
-                }
-                if ($height_px < 0) { $height_px = 0; }
-                $field_box_height = $height_px > 0 ? $height_px : 86;
-            ?>
-              <div class="ribo-field" data-field-id="<?php echo esc_attr($fid); ?>" style="left:<?php echo esc_attr($left_pct); ?>%;top:<?php echo esc_attr(round($top_px, 1)); ?>px;width:<?php echo esc_attr($width_pct); ?>%;min-height:<?php echo esc_attr(round($field_box_height, 1)); ?>px;">
+      $height_px = 0;
+      if (isset($settings['height'])) {
+        $height_px = floatval($settings['height']);
+      }
+      elseif (isset($settings['box_height'])) {
+        $height_px = floatval($settings['box_height']);
+      }
+
+      if ($height_px <= 0) {
+        $height_px = $label ? 92 : 64;
+      }
+
+      $field_box_height = round($height_px, 1);
+?>
+              <div class="ribo-field" data-field-id="<?php echo esc_attr($fid); ?>" style="left:<?php echo esc_attr($left_pct); ?>%;top:<?php echo esc_attr(round($top_px, 1)); ?>px;width:<?php echo esc_attr($width_pct); ?>%;min-height:<?php echo esc_attr($field_box_height); ?>px;">
                 <?php if ($label): ?>
                   <label for="<?php echo esc_attr($fid); ?>"><?php echo esc_html($label); ?><?php echo $required ? ' <span class="ribo-req">*</span>' : ''; ?></label>
-                <?php endif; ?>
+                <?php
+      endif; ?>
 
                 <?php if ($type === 'textarea'): ?>
-                  <textarea id="<?php echo esc_attr($fid); ?>" name="<?php echo esc_attr($fid); ?>" placeholder="<?php echo esc_attr($ph); ?>" <?php echo $required ? 'required' : ''; ?><?php echo $height_px ? ' style="height:' . esc_attr($height_px) . 'px;min-height:' . esc_attr($height_px) . 'px;"' : ''; ?>></textarea>
-                <?php elseif ($type === 'dropdown'):
-                    $choices = $settings['choices'] ?? [];
-                    if (!is_array($choices)) $choices = [];
-                ?>
-                  <select id="<?php echo esc_attr($fid); ?>" name="<?php echo esc_attr($fid); ?>" <?php echo $required ? 'required' : ''; ?><?php echo $height_px ? ' style="height:' . esc_attr($height_px) . 'px;"' : ''; ?>>
+                  <textarea id="<?php echo esc_attr($fid); ?>" name="<?php echo esc_attr($fid); ?>" placeholder="<?php echo esc_attr($ph); ?>" <?php echo $required ? 'required' : ''; ?>></textarea>
+                <?php
+      elseif ($type === 'dropdown'):
+        $choices = $settings['choices'] ?? [];
+        if (!is_array($choices))
+          $choices = [];
+?>
+                  <select id="<?php echo esc_attr($fid); ?>" name="<?php echo esc_attr($fid); ?>" <?php echo $required ? 'required' : ''; ?>>
                     <option value="">Select…</option>
-                    <?php foreach ($choices as $c): $c = sanitize_text_field($c); ?>
+                    <?php foreach ($choices as $c):
+          $c = sanitize_text_field($c); ?>
                       <option value="<?php echo esc_attr($c); ?>"><?php echo esc_html($c); ?></option>
-                    <?php endforeach; ?>
+                    <?php
+        endforeach; ?>
                   </select>
-                <?php elseif ($type === 'checkboxes'):
-                    $choices = $settings['choices'] ?? [];
-                    if (!is_array($choices)) $choices = [];
-                ?>
-                  <div class="ribo-choices"<?php echo $height_px ? ' style="max-height:' . esc_attr($height_px) . 'px;overflow:auto;"' : ''; ?>>
-                    <?php foreach ($choices as $c): $c = sanitize_text_field($c); ?>
+                <?php
+      elseif ($type === 'checkboxes'):
+        $choices = $settings['choices'] ?? [];
+        if (!is_array($choices))
+          $choices = [];
+?>
+                  <div class="ribo-choices">
+                    <?php foreach ($choices as $c):
+          $c = sanitize_text_field($c); ?>
                       <label class="ribo-choice">
                         <input type="checkbox" name="<?php echo esc_attr($fid); ?>[]" value="<?php echo esc_attr($c); ?>">
                         <span><?php echo esc_html($c); ?></span>
                       </label>
-                    <?php endforeach; ?>
+                    <?php
+        endforeach; ?>
                   </div>
-                <?php elseif ($type === 'radio'):
-                    $choices = $settings['choices'] ?? [];
-                    if (!is_array($choices)) $choices = [];
-                ?>
-                  <div class="ribo-choices"<?php echo $height_px ? ' style="max-height:' . esc_attr($height_px) . 'px;overflow:auto;"' : ''; ?>>
-                    <?php foreach ($choices as $c): $c = sanitize_text_field($c); ?>
+                <?php
+      elseif ($type === 'radio'):
+        $choices = $settings['choices'] ?? [];
+        if (!is_array($choices))
+          $choices = [];
+?>
+                  <div class="ribo-choices">
+                    <?php foreach ($choices as $c):
+          $c = sanitize_text_field($c); ?>
                       <label class="ribo-choice">
                         <input type="radio" name="<?php echo esc_attr($fid); ?>" value="<?php echo esc_attr($c); ?>" <?php echo $required ? 'required' : ''; ?>>
                         <span><?php echo esc_html($c); ?></span>
                       </label>
-                    <?php endforeach; ?>
+                    <?php
+        endforeach; ?>
                   </div>
-                <?php elseif ($type === 'recaptcha'): ?>
+                <?php
+      elseif ($type === 'recaptcha'): ?>
                   <div class="ribo-recaptcha" style="padding:10px;border:1px dashed #dcdcde;border-radius:10px;background:#fbfbfb;color:#646970;">
                     reCAPTCHA placeholder (configure validation later)
                   </div>
-                <?php else:
-                    $html_type = ($type === 'email') ? 'email' : (($type === 'phone') ? 'tel' : (($type === 'number') ? 'number' : (($type === 'date') ? 'date' : 'text')));
-                    if ($type === 'file') { $html_type = 'url'; }
-                ?>
-                  <input id="<?php echo esc_attr($fid); ?>" type="<?php echo esc_attr($html_type); ?>" name="<?php echo esc_attr($fid); ?>" placeholder="<?php echo esc_attr($ph); ?>" <?php echo $required ? 'required' : ''; ?><?php echo $height_px ? ' style="height:' . esc_attr($height_px) . 'px;"' : ''; ?>>
-                <?php endif; ?>
+                <?php
+      else:
+        $html_type = ($type === 'email') ? 'email' : (($type === 'phone') ? 'tel' : (($type === 'number') ? 'number' : (($type === 'date') ? 'date' : 'text')));
+        if ($type === 'file') {
+          $html_type = 'url';
+        }
+?>
+                  <input id="<?php echo esc_attr($fid); ?>" type="<?php echo esc_attr($html_type); ?>" name="<?php echo esc_attr($fid); ?>" placeholder="<?php echo esc_attr($ph); ?>" <?php echo $required ? 'required' : ''; ?>>
+                <?php
+      endif; ?>
 
                 <div class="ribo-error" data-error-for="<?php echo esc_attr($fid); ?>"></div>
               </div>
-            <?php endforeach; ?>
+            <?php
+    endforeach; ?>
             </div>
 
             <button type="submit" class="ribo-submit"><?php echo esc_html($submit_text); ?></button>
@@ -177,6 +239,6 @@ class RIBO_Shortcode {
           </form>
         </div>
         <?php
-        return ob_get_clean();
-    }
+    return ob_get_clean();
+  }
 }
