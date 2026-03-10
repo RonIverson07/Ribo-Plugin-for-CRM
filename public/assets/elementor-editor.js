@@ -92,4 +92,12 @@
         }, 500);
     });
 
+    // Listen for custom "form updated" events from the iframe or other sources
+    $(document).on('ribo:form:updated', function () {
+        var activeView = elementor.panel.currentView.view;
+        if (activeView && activeView.getEditModel) {
+            syncWidgetFromDB(activeView);
+        }
+    });
+
 })(jQuery);
