@@ -1,0 +1,161 @@
+/* ============================================================
+   RIBO – Elementor Editor Interactive Canvas Styles
+   Applies ONLY inside the Elementor preview iframe.
+   ============================================================ */
+
+/* --- Interactive wrapper --- */
+.ribo-el-interactive {
+    position: relative;
+    width: 100%;
+}
+
+.ribo-el-interactive .ribo-form-wrap {
+    pointer-events: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+}
+
+.ribo-el-interactive .ribo-form-stage {
+    position: relative !important;
+    width: 100% !important;
+    overflow: visible !important;
+    box-sizing: border-box;
+}
+
+/* Fields are absolute-positioned inside the stage */
+.ribo-el-interactive .ribo-field {
+    position: absolute !important;
+    pointer-events: auto !important;
+    box-sizing: border-box;
+    cursor: default;
+    outline: 1px dashed transparent;
+    transition: outline-color 0.1s;
+}
+
+.ribo-el-interactive .ribo-field:hover {
+    outline: 1px dashed #9b59b6;
+}
+
+.ribo-el-interactive .ribo-field.ribo-el-selected {
+    outline: 2px solid #9b59b6 !important;
+    z-index: 50;
+}
+
+.ribo-el-interactive .ribo-field.ribo-el-dragging {
+    opacity: 0.85;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+    z-index: 200 !important;
+    outline: 2px solid #9b59b6 !important;
+}
+
+.ribo-el-interactive .ribo-field.ribo-el-resizing {
+    z-index: 200 !important;
+    outline: 2px solid #3498db !important;
+}
+
+/* --- Drag handle bar at top of field --- */
+.ribo-el-drag-handle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 16px;
+    background: linear-gradient(90deg, #9b59b6, #8e44ad);
+    border-radius: 4px 4px 0 0;
+    cursor: move;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 10;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: 2px;
+    user-select: none;
+}
+
+.ribo-el-interactive .ribo-field:hover .ribo-el-drag-handle,
+.ribo-el-interactive .ribo-field.ribo-el-selected .ribo-el-drag-handle {
+    opacity: 1;
+}
+
+/* --- Resize handles --- */
+.ribo-el-rh {
+    position: absolute;
+    background: #9b59b6;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    z-index: 20;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.ribo-el-interactive .ribo-field:hover .ribo-el-rh,
+.ribo-el-interactive .ribo-field.ribo-el-selected .ribo-el-rh {
+    opacity: 1;
+}
+
+/* SE corner – main resize handle */
+.ribo-el-rh-se {
+    width: 12px;
+    height: 12px;
+    right: -6px;
+    bottom: -6px;
+    cursor: se-resize;
+}
+
+/* E edge – width resize */
+.ribo-el-rh-e {
+    width: 8px;
+    height: 28px;
+    right: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 4px;
+    cursor: e-resize;
+}
+
+/* S edge – height resize */
+.ribo-el-rh-s {
+    width: 28px;
+    height: 8px;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 4px;
+    cursor: s-resize;
+}
+
+/* --- Save indicator toast --- */
+#ribo-el-save-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #2ecc71;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+    z-index: 99999;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+}
+
+#ribo-el-save-toast.ribo-el-toast-show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Prevent inputs from being accidentally triggered while in canvas edit mode */
+.ribo-el-interactive .ribo-field input,
+.ribo-el-interactive .ribo-field textarea,
+.ribo-el-interactive .ribo-field select {
+    pointer-events: none;
+}

@@ -28,6 +28,13 @@ class RIBO_Shortcode {
             'status' => $form['status'],
         ]);
 
+        return self::render_schema($schema);
+    }
+
+    public static function render_schema($schema) {
+        if (!is_array($schema)) { return '<!-- ribo_form: invalid schema -->'; }
+
+        $form_id = sanitize_text_field($schema['id'] ?? '');
         $fields = isset($schema['fields']) && is_array($schema['fields']) ? $schema['fields'] : [];
         $ui = isset($schema['ui']) && is_array($schema['ui']) ? $schema['ui'] : [];
         $submit_text = isset($ui['submit_text']) ? sanitize_text_field($ui['submit_text']) : 'Send';
@@ -54,14 +61,18 @@ class RIBO_Shortcode {
 
         wp_enqueue_style('ribo-form-css');
         wp_enqueue_script('ribo-form-js');
-        wp_localize_script('ribo-form-js', 'RIBO_FORM', [
-            'restUrl' => esc_url_raw(rest_url('ribo/v1/forms/' . $form_id . '/submit')),
-            'nonce' => wp_create_nonce('wp_rest')
-        ]);
+
+        // We only localize if we have a form_id. If it's a real-time preview (no ID yet), we might need to handle it.
+        if ($form_id) {
+            wp_localize_script('ribo-form-js', 'RIBO_FORM', [
+                'restUrl' => esc_url_raw(rest_url('ribo/v1/forms/' . $form_id . '/submit')),
+                'nonce' => wp_create_nonce('wp_rest')
+            ]);
+        }
 
         ob_start();
         ?>
-        <div class="ribo-form-wrap ribo-form-wrap--layout" data-form-id="<?php echo esc_attr($form_id); ?>" style="max-width:<?php echo esc_attr(round($base_width, 1)); ?>px;">
+        <div class="ribo-form-wrap ribo-form-wrap--layout" data-form-id="<?php echo esc_attr($form_id); ?>" data-canvas-width="<?php echo esc_attr(round($base_width, 1)); ?>" style="width:100%; max-width:100%;">
           <form class="ribo-form ribo-form--layout" novalidate>
             <input type="hidden" name="_page_url" value="<?php echo esc_url(get_permalink()); ?>">
             <div class="ribo-form-stage" style="min-height:<?php echo esc_attr(round($stage_height, 1)); ?>px;">
@@ -104,7 +115,7 @@ class RIBO_Shortcode {
                 if ($height_px < 0) { $height_px = 0; }
                 $field_box_height = $height_px > 0 ? $height_px : 86;
             ?>
-              <div class="ribo-field" style="left:<?php echo esc_attr($left_pct); ?>%;top:<?php echo esc_attr(round($top_px, 1)); ?>px;width:<?php echo esc_attr($width_pct); ?>%;min-height:<?php echo esc_attr(round($field_box_height, 1)); ?>px;">
+              <div class="ribo-field" data-field-id="<?php echo esc_attr($fid); ?>" style="left:<?php echo esc_attr($left_pct); ?>%;top:<?php echo esc_attr(round($top_px, 1)); ?>px;width:<?php echo esc_attr($width_pct); ?>%;min-height:<?php echo esc_attr(round($field_box_height, 1)); ?>px;">
                 <?php if ($label): ?>
                   <label for="<?php echo esc_attr($fid); ?>"><?php echo esc_html($label); ?><?php echo $required ? ' <span class="ribo-req">*</span>' : ''; ?></label>
                 <?php endif; ?>
@@ -129,6 +140,18 @@ class RIBO_Shortcode {
                     <?php foreach ($choices as $c): $c = sanitize_text_field($c); ?>
                       <label class="ribo-choice">
                         <input type="checkbox" name="<?php echo esc_attr($fid); ?>[]" value="<?php echo esc_attr($c); ?>">
+                        <span><?php echo esc_html($c); ?></span>
+                      </label>
+                    <?php endforeach; ?>
+                  </div>
+                <?php elseif ($type === 'radio'):
+                    $choices = $settings['choices'] ?? [];
+                    if (!is_array($choices)) $choices = [];
+                ?>
+                  <div class="ribo-choices"<?php echo $height_px ? ' style="max-height:' . esc_attr($height_px) . 'px;overflow:auto;"' : ''; ?>>
+                    <?php foreach ($choices as $c): $c = sanitize_text_field($c); ?>
+                      <label class="ribo-choice">
+                        <input type="radio" name="<?php echo esc_attr($fid); ?>" value="<?php echo esc_attr($c); ?>" <?php echo $required ? 'required' : ''; ?>>
                         <span><?php echo esc_html($c); ?></span>
                       </label>
                     <?php endforeach; ?>

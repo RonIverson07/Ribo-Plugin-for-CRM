@@ -79,6 +79,7 @@ require_once RIBO_WP_INBOUND_DIR . 'includes/class-shortcode.php';
 require_once RIBO_WP_INBOUND_DIR . 'includes/class-blocks.php';
 require_once RIBO_WP_INBOUND_DIR . 'includes/class-widget.php';
 require_once RIBO_WP_INBOUND_DIR . 'includes/class-cron.php';
+require_once RIBO_WP_INBOUND_DIR . 'includes/class-elementor-loader.php';
 require_once RIBO_WP_INBOUND_DIR . 'admin/class-admin-menu.php';
 
 register_activation_hook(__FILE__, ['RIBO_DB', 'activate']);
@@ -94,6 +95,9 @@ add_action('plugins_loaded', function() {
     RIBO_Blocks::init();
     if (class_exists('RIBO_Form_Widget')) {
         RIBO_Form_Widget::init();
+    }
+    if (RIBO_Elementor_Loader::is_elementor_active()) {
+        RIBO_Elementor_Loader::init();
     }
     if (is_admin()) {
         RIBO_Admin_Menu::init();

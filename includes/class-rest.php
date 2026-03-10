@@ -17,6 +17,78 @@ class RIBO_REST
             'callback' => [__CLASS__, 'submit_form'],
             'permission_callback' => '__return_true',
         ]);
+
+        // Saves drag-and-drop positions from the Elementor canvas editor
+        register_rest_route('ribo/v1', '/forms/(?P<form_id>[a-zA-Z0-9_\-]+)/update-layout', [
+            'methods'             => 'POST',
+            'callback'            => [__CLASS__, 'update_layout'],
+            'permission_callback' => function() { return current_user_can('edit_posts'); },
+        ]);
+    }
+
+    /**
+     * Save drag-and-drop / resize positions sent by the Elementor canvas editor.
+     * Merges position data (canvas_x, canvas_y, width, height) into the DB schema
+     * for fields that still exist. Does NOT modify labels, types, or mapping.
+     */
+    public static function update_layout($request)
+    {
+        $form_id = sanitize_text_field($request['form_id']);
+        $form    = RIBO_DB::get_form($form_id);
+
+        if (!$form) {
+            return new WP_REST_Response(['ok' => false, 'error' => 'Form not found'], 404);
+        }
+
+        $schema = json_decode($form['schema_json'], true);
+        if (!is_array($schema)) {
+            return new WP_REST_Response(['ok' => false, 'error' => 'Invalid schema'], 500);
+        }
+
+        $incoming = $request->get_json_params();
+        $fields_incoming = isset($incoming['fields']) && is_array($incoming['fields']) ? $incoming['fields'] : [];
+
+        // Build lookup map: field_id => position data
+        $update_map = [];
+        foreach ($fields_incoming as $fu) {
+            $fid = sanitize_text_field($fu['id'] ?? '');
+            if (!$fid) continue;
+            $update_map[$fid] = $fu;
+        }
+
+        // Merge position-only data for matching fields
+        foreach ($schema['fields'] as &$f) {
+            $fid = $f['id'] ?? '';
+            if (!isset($update_map[$fid])) continue;
+            $u = $update_map[$fid];
+            $f['settings'] = isset($f['settings']) && is_array($f['settings']) ? $f['settings'] : [];
+
+            if (isset($u['canvas_x']) && is_numeric($u['canvas_x'])) {
+                $f['settings']['canvas_x'] = round(floatval($u['canvas_x']), 1);
+            }
+            if (isset($u['canvas_y']) && is_numeric($u['canvas_y'])) {
+                $f['settings']['canvas_y'] = round(floatval($u['canvas_y']), 1);
+            }
+            if (isset($u['width']) && is_numeric($u['width'])) {
+                $w = (float) $u['width'];
+                if ($w >= 1 && $w <= 12) {
+                    $f['width'] = round($w, 1);
+                }
+            }
+            if (isset($u['height']) && is_numeric($u['height'])) {
+                $h = (float) $u['height'];
+                if ($h >= 24) {
+                    $f['settings']['height']     = round($h, 1);
+                    $f['settings']['box_height'] = round($h, 1);
+                }
+            }
+        }
+        unset($f);
+
+        $schema_json = wp_json_encode($schema, JSON_PRETTY_PRINT);
+        RIBO_DB::upsert_form($form['id'], $form['name'], $schema_json, $form['status'], (int) $form['version']);
+
+        return new WP_REST_Response(['ok' => true], 200);
     }
 
     private static function truncate($val, $limit)
