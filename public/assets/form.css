@@ -1,0 +1,103 @@
+.ribo-form-wrap.ribo-form-wrap,
+.ribo-form-wrap.ribo-form-wrap *,
+.ribo-form-wrap.ribo-form-wrap *::before,
+.ribo-form-wrap.ribo-form-wrap *::after{box-sizing:border-box}
+
+.ribo-form-wrap.ribo-form-wrap,
+.ribo-form-wrap.ribo-form-wrap form,
+.ribo-form-wrap.ribo-form-wrap fieldset,
+.ribo-form-wrap.ribo-form-wrap .ribo-form,
+.ribo-form-wrap.ribo-form-wrap .ribo-form-stage,
+.ribo-form-wrap.ribo-form-wrap .ribo-field,
+.ribo-form-wrap.ribo-form-wrap .ribo-field label,
+.ribo-form-wrap.ribo-form-wrap .ribo-choice,
+.ribo-form-wrap.ribo-form-wrap .ribo-submit,
+.ribo-form-wrap.ribo-form-wrap .ribo-status{
+  margin:0;
+  padding:0;
+  border:0;
+  font:inherit;
+  color:inherit;
+  line-height:1.4;
+  letter-spacing:normal;
+  text-transform:none;
+  float:none;
+}
+
+.ribo-form-wrap.ribo-form-wrap{max-width:720px;margin:18px 0;padding:16px;border:1px solid rgba(0,0,0,.08);border-radius:12px;background:#fff}
+.ribo-form-wrap.ribo-form-wrap .ribo-form{display:flex;flex-wrap:wrap;gap:12px;width:100%}
+.ribo-form-wrap.ribo-form-wrap .ribo-form-stage{position:relative;width:100%;min-width:0;max-width:none;overflow:visible}
+.ribo-form-wrap.ribo-form-wrap .ribo-field{margin-bottom:0;display:flex;flex-direction:column;min-width:0;max-width:none}
+.ribo-form-wrap.ribo-form-wrap .ribo-field label{display:block;font-weight:600;margin-bottom:6px;max-width:none;width:auto}
+.ribo-form-wrap.ribo-form-wrap .ribo-req{color:#d63638}
+
+.ribo-form-wrap.ribo-form-wrap .ribo-field > input:not([type="checkbox"]):not([type="radio"]),
+.ribo-form-wrap.ribo-form-wrap .ribo-field > textarea,
+.ribo-form-wrap.ribo-form-wrap .ribo-field > select,
+.ribo-form-wrap.ribo-form-wrap .ribo-submit{
+  display:block;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  margin:0;
+  padding:10px 12px;
+  border:1px solid rgba(0,0,0,.18);
+  border-radius:10px;
+  background:#fff;
+  color:inherit;
+  font:inherit;
+  line-height:1.4;
+  letter-spacing:normal;
+  min-height:0;
+  box-shadow:none;
+  float:none;
+}
+
+.ribo-form-wrap.ribo-form-wrap .ribo-field > input:not([type="checkbox"]):not([type="radio"]),
+.ribo-form-wrap.ribo-form-wrap .ribo-field > select{height:auto}
+
+.ribo-form-wrap.ribo-form-wrap .ribo-field > input,
+.ribo-form-wrap.ribo-form-wrap .ribo-field > textarea,
+.ribo-form-wrap.ribo-form-wrap .ribo-field > select{
+  overflow:visible;
+  vertical-align:middle;
+}
+
+.ribo-form-wrap.ribo-form-wrap .ribo-field > input:not([type="checkbox"]):not([type="radio"]),
+.ribo-form-wrap.ribo-form-wrap .ribo-field > textarea{
+  -webkit-appearance:none;
+  appearance:none;
+}
+
+.ribo-form-wrap.ribo-form-wrap .ribo-field > select{
+  -webkit-appearance:auto;
+  appearance:auto;
+}
+
+.ribo-form-wrap.ribo-form-wrap .ribo-field > textarea{
+  min-height:110px;
+  overflow:auto;
+  resize:vertical;
+}
+
+.ribo-form-wrap.ribo-form-wrap .ribo-choices{display:flex;flex-direction:column;gap:8px;max-width:100%}
+.ribo-form-wrap.ribo-form-wrap .ribo-choice{display:flex;gap:10px;align-items:center;max-width:100%}
+.ribo-form-wrap.ribo-form-wrap .ribo-choice > input{width:auto;max-width:none;margin:0;flex:0 0 auto}
+.ribo-form-wrap.ribo-form-wrap .ribo-choice > span{font:inherit;line-height:1.4}
+.ribo-form-wrap.ribo-form-wrap .ribo-error{color:#d63638;font-size:12px;margin-top:6px;min-height:14px;line-height:1.3}
+.ribo-form-wrap.ribo-form-wrap .ribo-submit{padding:10px 14px;border:0;border-radius:12px;cursor:pointer;display:inline-block;max-width:100%;font:inherit;line-height:1.4}
+.ribo-form-wrap.ribo-form-wrap .ribo-submit,.ribo-form-wrap.ribo-form-wrap .ribo-status{flex:0 0 100%;max-width:100%}
+.ribo-form-wrap.ribo-form-wrap .ribo-status{margin-top:10px;font-size:13px;opacity:.9}
+
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout{width:100%}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-form{display:block}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-form-stage{position:relative;width:100%;overflow:visible}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-field{position:absolute;box-sizing:border-box;margin:0;display:flex;flex-direction:column}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-field > input:not([type="checkbox"]):not([type="radio"]),
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-field > textarea,
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-field > select{width:100%;max-width:100%;min-width:0;align-self:stretch}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-field > textarea{resize:none}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-submit,
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-status{display:block;width:100%;max-width:100%}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-submit{margin-top:12px}
+.ribo-form-wrap.ribo-form-wrap.ribo-form-wrap--layout .ribo-status{margin-top:10px}

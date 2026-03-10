@@ -1,0 +1,375 @@
+.ribo-builder {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.ribo-card {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.ribo-card h2 {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+  padding: 12px 12px;
+  border-bottom: 1px solid #f0f0f1;
+}
+
+.ribo-card .ribo-card-body {
+  padding: 12px;
+}
+
+/* Left palette */
+.ribo-palette-group {
+  margin-bottom: 12px;
+}
+.ribo-palette-group-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #50575e;
+  margin: 10px 0 8px;
+}
+
+.ribo-field-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 10px 10px;
+  margin-bottom: 8px;
+  background: #fff;
+  cursor: grab;
+  user-select: none;
+}
+.ribo-field-item:active { cursor: grabbing; }
+
+.ribo-field-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #f6f7f7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #1d2327;
+  font-size: 12px;
+}
+
+/* Canvas */
+.ribo-canvas {
+  min-height: 520px;
+  padding: 12px;
+  overflow: visible;
+}
+
+.ribo-canvas-empty {
+  border: 2px dashed #dcdcde;
+  border-radius: 14px;
+  padding: 18px;
+  color: #50575e;
+  background: #fbfbfb;
+}
+
+.ribo-canvas-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-height: 360px;
+  position: relative;
+  overflow: visible;
+}
+
+.ribo-canvas-item {
+  position: absolute;
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  padding: 12px;
+  margin: 0;
+  background: #fff;
+  cursor: move;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+/* Manual resize handles (drag edges) */
+.ribo-canvas-item .ui-resizable-handle{
+  position: absolute;
+  z-index: 5;
+}
+.ribo-canvas-item .ui-resizable-e{
+  top: 0;
+  right: -6px;
+  width: 12px;
+  height: 100%;
+  cursor: ew-resize;
+}
+.ribo-canvas-item .ui-resizable-s{
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 12px;
+  cursor: ns-resize;
+}
+.ribo-canvas-item .ui-resizable-se{
+  right: -7px;
+  bottom: -7px;
+  width: 14px;
+  height: 14px;
+  cursor: nwse-resize;
+  background: #eef2f7;
+  border: 1px solid #cfd8e3;
+  border-radius: 6px;
+}
+
+/* Larger "Canva-like" hit areas for resizing (8 handles). These are transparent
+   but take ~10px boundary so users can easily grab edges/corners. */
+.ribo-canvas-item .ribo-resize-handle{
+  position: absolute;
+  z-index: 6;
+  background: transparent;
+  pointer-events: auto;
+}
+
+/* Extend handles slightly OUTSIDE the card so resizing from left/top/bottom is easy. */
+.ribo-canvas-item .ribo-resize-n{ top: -8px; left: 10px; right: 10px; height: 16px; cursor: ns-resize; }
+.ribo-canvas-item .ribo-resize-s{ bottom: -8px; left: 10px; right: 10px; height: 16px; cursor: ns-resize; }
+.ribo-canvas-item .ribo-resize-e{ right: -8px; top: 10px; bottom: 10px; width: 16px; cursor: ew-resize; }
+.ribo-canvas-item .ribo-resize-w{ left: -8px; top: 10px; bottom: 10px; width: 16px; cursor: ew-resize; }
+
+.ribo-canvas-item .ribo-resize-ne{ right: -8px; top: -8px; width: 16px; height: 16px; cursor: nesw-resize; }
+.ribo-canvas-item .ribo-resize-nw{ left: -8px; top: -8px; width: 16px; height: 16px; cursor: nwse-resize; }
+.ribo-canvas-item .ribo-resize-se{ right: -8px; bottom: -8px; width: 16px; height: 16px; cursor: nwse-resize; }
+.ribo-canvas-item .ribo-resize-sw{ left: -8px; bottom: -8px; width: 16px; height: 16px; cursor: nesw-resize; }
+
+/* Show a subtle corner nub only when item is selected/hovered, still easy to grab */
+.ribo-canvas-item.is-selected .ribo-resize-ne,
+.ribo-canvas-item.is-selected .ribo-resize-nw,
+.ribo-canvas-item.is-selected .ribo-resize-se,
+.ribo-canvas-item.is-selected .ribo-resize-sw,
+.ribo-canvas-item:hover .ribo-resize-ne,
+.ribo-canvas-item:hover .ribo-resize-nw,
+.ribo-canvas-item:hover .ribo-resize-se,
+.ribo-canvas-item:hover .ribo-resize-sw{
+  background: #eef2f7;
+  border: 1px solid #cfd8e3;
+  border-radius: 6px;
+}
+
+/* Also hint edge handles on hover/selected so users discover top/left/bottom resizing. */
+.ribo-canvas-item.is-selected .ribo-resize-n,
+.ribo-canvas-item.is-selected .ribo-resize-s,
+.ribo-canvas-item.is-selected .ribo-resize-e,
+.ribo-canvas-item.is-selected .ribo-resize-w,
+.ribo-canvas-item:hover .ribo-resize-n,
+.ribo-canvas-item:hover .ribo-resize-s,
+.ribo-canvas-item:hover .ribo-resize-e,
+.ribo-canvas-item:hover .ribo-resize-w{
+  background: rgba(238,242,247,0.55);
+  border: 1px solid rgba(207,216,227,0.75);
+  border-radius: 999px;
+}
+.ribo-canvas-item.ribo-is-resizing{
+  border-color: rgba(34,113,177,.45);
+  box-shadow: 0 0 0 2px rgba(34,113,177,0.15), 0 10px 28px rgba(15,23,42,.10);
+}
+.ribo-canvas-item.ribo-is-dragging{
+  z-index: 20;
+  box-shadow: 0 12px 28px rgba(15,23,42,.16);
+}
+
+.ribo-canvas-list.ribo-drop-hover,
+.ribo-canvas-empty.ribo-drop-hover{
+  outline: 2px dashed rgba(34,113,177,.35);
+  outline-offset: 4px;
+}
+
+
+.ribo-canvas-item.is-selected {
+  border-color: #2271b1;
+  box-shadow: 0 0 0 2px rgba(34,113,177,0.15);
+}
+
+.ribo-canvas-item-head {
+  display: flex;
+  cursor: move;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ribo-canvas-item-title {
+  font-weight: 600;
+}
+
+.ribo-canvas-item-meta {
+  font-size: 12px;
+  color: #646970;
+}
+
+.ribo-canvas-item-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.ribo-icon-btn {
+  border: 1px solid #dcdcde;
+  background: #fff;
+  border-radius: 10px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.ribo-icon-btn:hover { background: #f6f7f7; }
+
+.ribo-sort-placeholder {
+  height: 54px;
+  border: 2px dashed #c3c4c7;
+  border-radius: 14px;
+  margin: 0;
+  grid-column: 1 / -1;
+}
+
+/* Right panel */
+.ribo-options .description {
+  margin-top: 0;
+}
+
+.ribo-form-row {
+  margin-bottom: 12px;
+}
+
+.ribo-form-row label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.ribo-form-row input[type="text"],
+.ribo-form-row input[type="number"],
+.ribo-form-row select,
+.ribo-form-row textarea {
+  width: 100%;
+}
+
+.ribo-inline {
+  display: flex;
+  gap: 10px;
+}
+
+.ribo-inline > div {
+  flex: 1;
+}
+
+.ribo-choices-editor textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.ribo-topbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.ribo-topbar .left {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+}
+
+.ribo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #dcdcde;
+  background: #fff;
+  font-size: 12px;
+  min-width: 0;
+}
+
+/* Form Builder header title must remain single-line (no manual wraps).
+   If it gets too long, we truncate with ellipsis instead of wrapping. */
+.ribo-form-title{
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40ch;
+}
+
+.ribo-muted { color: #646970; }
+
+/* --------------------------------------------------------------------------
+   Preview Mode (show the real form UI)
+----------------------------------------------------------------------------*/
+
+.ribo-preview-mode .ribo-builder{
+  grid-template-columns: 1fr;
+}
+.ribo-preview-mode .ribo-builder > .ribo-card:first-child{
+  display:none;
+}
+.ribo-preview-mode .ribo-builder .ribo-options{
+  display:none;
+}
+
+.ribo-preview-host{
+  padding: 0;
+}
+
+.ribo-preview-host .ribo-form-wrap.ribo-form-wrap--builder{
+  width: 100%;
+}
+
+/* Builder preview form uses the PUBLIC form.css, plus a 12-col grid so
+   fields can reflect the builder widths when present in schema. */
+.ribo-form-wrap.ribo-form-wrap--builder{
+  max-width: 100%;
+  margin: 0;
+}
+.ribo-form-wrap.ribo-form-wrap--builder .ribo-form{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.ribo-form-wrap.ribo-form-wrap--builder .ribo-field{
+  margin-bottom: 0; /* grid gap already handles spacing */
+}
+.ribo-form-wrap.ribo-form-wrap--builder .ribo-submit,
+.ribo-form-wrap.ribo-form-wrap--builder .ribo-status{
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+
+/* If a field wrapper has a fixed height, let the input stretch.
+   (Useful for previewing the builder's height adjustments.) */
+.ribo-form-wrap.ribo-form-wrap--builder .ribo-field{ display: flex; flex-direction: column; }
+.ribo-form-wrap.ribo-form-wrap--builder .ribo-field input,
+.ribo-form-wrap.ribo-form-wrap--builder .ribo-field select,
+.ribo-form-wrap.ribo-form-wrap--builder .ribo-field textarea{ flex: 1 1 auto; }
+
+
+
+.ribo-form-wrap.ribo-form-wrap--layout{width:100%}
+.ribo-form-wrap.ribo-form-wrap--layout .ribo-form.ribo-form--layout{display:block}
+.ribo-form-wrap.ribo-form-wrap--layout .ribo-form-stage{position:relative;width:100%}
+.ribo-form-wrap.ribo-form-wrap--layout .ribo-field{position:absolute;box-sizing:border-box;margin:0;display:flex;flex-direction:column}
+.ribo-form-wrap.ribo-form-wrap--layout .ribo-field input,
+.ribo-form-wrap.ribo-form-wrap--layout .ribo-field textarea,
+.ribo-form-wrap.ribo-form-wrap--layout .ribo-field select{width:100%;max-width:100%;box-sizing:border-box}
+.ribo-form-wrap.ribo-form-wrap--layout .ribo-submit,
+.ribo-form-wrap.ribo-form-wrap--layout .ribo-status{display:block;width:100%;max-width:100%}
+.ribo-form-wrap.ribo-form-wrap--layout .ribo-submit{margin-top:12px}
+.ribo-form-wrap.ribo-form-wrap--layout .ribo-status{margin-top:10px}

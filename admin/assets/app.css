@@ -1,0 +1,291 @@
+/* RIBO CRM Admin UI (Lovable-inspired) */
+:root{
+  --ribo-bg: #f5f7fb;
+  --ribo-card: #ffffff;
+  --ribo-border: #e6eaf2;
+  --ribo-text: #0f172a;
+  --ribo-muted: #64748b;
+  --ribo-primary: #2563eb;
+  --ribo-primary-2: #1d4ed8;
+  --ribo-sidebar: #0b1220;
+  --ribo-sidebar-2: #0f172a;
+  --ribo-sidebar-text: #cbd5e1;
+  --ribo-sidebar-active: rgba(255,255,255,0.08);
+  --ribo-radius: 14px;
+  --ribo-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+}
+
+/* Reduce WP default padding around plugin pages */
+#wpcontent{ padding-left: 0; }
+#wpbody-content{ padding-bottom: 0; }
+
+.ribo-admin-app{
+  display:flex;
+  flex-direction: column;
+  min-height: calc(100vh - 32px);
+  background: var(--ribo-bg);
+}
+
+/* Top tabs navigation (replaces sidebar) */
+.ribo-navtabs-bar{
+  background:#fff;
+  border-bottom: 1px solid rgba(226, 232, 240, .9);
+  position: sticky;
+  top: 32px; /* WP admin bar */
+  z-index: 50;
+}
+.ribo-navtabs-bar__inner{
+  display:flex;
+  align-items:center;
+  gap: 18px;
+  padding: 14px 18px;
+}
+.ribo-brand--top{ padding: 0; }
+
+/* Ensure brand text is readable on the white top bar */
+.ribo-navtabs-bar .ribo-brand-title{ color: var(--ribo-text); }
+.ribo-navtabs-bar .ribo-brand-sub{ color: var(--ribo-muted); }
+
+.ribo-tabs{
+  display:flex;
+  align-items:center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.ribo-tab{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-decoration:none;
+  color: var(--ribo-text);
+  font-weight: 600;
+  line-height: 1;
+}
+.ribo-tab .dashicons{ font-size: 18px; width:18px; height:18px; }
+.ribo-tab:hover{ background: rgba(59,130,246,.08); }
+.ribo-tab.is-active{
+  background: rgba(59,130,246,.12);
+  color: #1d4ed8;
+}
+
+.ribo-sidebar{
+  width: 260px;
+  background: linear-gradient(180deg, var(--ribo-sidebar), var(--ribo-sidebar-2));
+  color: var(--ribo-sidebar-text);
+  padding: 18px 14px;
+  box-sizing: border-box;
+}
+
+.ribo-brand{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  padding: 10px 10px 18px;
+}
+
+.ribo-brand-badge{
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--ribo-primary);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-weight:700;
+}
+
+.ribo-brand-title{ font-size: 15px; font-weight: 700; color:#fff; line-height: 1.1; }
+.ribo-brand-sub{ font-size: 12px; color: rgba(203,213,225,0.75); margin-top: 2px; }
+
+.ribo-nav-title{
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(203,213,225,0.65);
+  padding: 8px 10px;
+}
+
+.ribo-nav a{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 10px 10px;
+  border-radius: 12px;
+  color: var(--ribo-sidebar-text);
+  text-decoration:none;
+  margin: 4px 0;
+}
+
+.ribo-nav a:hover{ background: rgba(255,255,255,0.06); }
+.ribo-nav a.is-active{ background: var(--ribo-sidebar-active); color:#fff; }
+
+.ribo-nav .dashicons{ color: rgba(203,213,225,0.85); font-size: 18px; }
+
+.ribo-main{
+  flex:1;
+  padding: 22px 28px;
+  box-sizing: border-box;
+}
+
+.ribo-topbar{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.ribo-topbar h1{
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ribo-text);
+}
+
+.ribo-page-title{
+  font-size: 32px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  margin: 10px 0 6px;
+  color: var(--ribo-text);
+}
+
+.ribo-page-sub{
+  margin: 0 0 18px;
+  color: var(--ribo-muted);
+  font-size: 14px;
+}
+
+.ribo-grid{
+  display:grid;
+  gap: 18px;
+}
+
+.ribo-grid.two{
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 1100px){
+  .ribo-grid.two{ grid-template-columns: 1fr; }
+  .ribo-sidebar{ width: 240px; }
+}
+
+.ribo-card{
+  background: var(--ribo-card);
+  border: 1px solid var(--ribo-border);
+  border-radius: var(--ribo-radius);
+  box-shadow: var(--ribo-shadow);
+  padding: 18px;
+}
+
+.ribo-card h2{
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.ribo-card p.desc{ margin: 0 0 14px; color: var(--ribo-muted); }
+
+.ribo-field{ margin-bottom: 14px; }
+.ribo-field label{ display:block; font-weight: 600; margin-bottom: 6px; color: var(--ribo-text); }
+.ribo-field input[type="text"],
+.ribo-field input[type="password"],
+.ribo-field input[type="number"],
+.ribo-field select{
+  width:100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--ribo-border);
+  background: #f8fafc;
+}
+
+.ribo-row{ display:flex; gap: 14px; }
+.ribo-row .ribo-field{ flex: 1; }
+
+.ribo-actions{ display:flex; gap: 10px; align-items:center; }
+
+.ribo-btn{
+  appearance:none;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor:pointer;
+}
+.ribo-btn-primary{ background: var(--ribo-primary); color:#fff; }
+.ribo-btn-primary:hover{ background: var(--ribo-primary-2); }
+.ribo-btn-secondary{ background: #eef2ff; color: #1e3a8a; border: 1px solid #dbeafe; }
+.ribo-btn-danger{ background: #ef4444; color:#fff; }
+
+/* Tables */
+.ribo-table{ width:100%; border-collapse: separate; border-spacing: 0; }
+.ribo-table th, .ribo-table td{ text-align:left; padding: 12px 14px; border-bottom: 1px solid var(--ribo-border); }
+.ribo-table th{ color: var(--ribo-muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+.ribo-table tr:last-child td{ border-bottom: 0; }
+
+.ribo-pill{ display:inline-flex; align-items:center; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.ribo-pill.draft{ background:#f1f5f9; color:#334155; }
+.ribo-pill.published{ background:#dbeafe; color:#1d4ed8; }
+.ribo-pill.pending{ background:#e0f2fe; color:#0369a1; }
+.ribo-pill.failed{ background:#fee2e2; color:#b91c1c; }
+
+/* Make WP notices fit */
+.ribo-main .notice{ margin: 0 0 16px; }
+
+
+/* Connection wizard helpers */
+.ribo-helpbox{
+  background:#f8fafc;
+  border:1px solid var(--ribo-border);
+  border-radius: 12px;
+  padding: 12px;
+}
+.ribo-step{ display:flex; gap: 10px; align-items:flex-start; margin: 8px 0; color: var(--ribo-text); }
+.ribo-step-num{
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 800;
+  flex: 0 0 24px;
+  margin-top: 1px;
+}
+
+.ribo-pill.ok{ background:#dcfce7; color:#166534; }
+.ribo-pill.bad{ background:#fee2e2; color:#991b1b; }
+
+.ribo-input-with-btn{ display:flex; gap: 10px; align-items:center; }
+.ribo-input-with-btn input{ flex: 1; }
+.ribo-inline-btn{ padding: 10px 12px; font-weight: 800; }
+
+.ribo-advanced{ border: 1px dashed var(--ribo-border); border-radius: 12px; padding: 10px 12px; background: #ffffff; }
+.ribo-advanced summary{ cursor:pointer; font-weight: 800; color: var(--ribo-text); }
+
+.ribo-kv{ border:1px solid var(--ribo-border); border-radius: 12px; overflow:hidden; background:#fff; }
+.ribo-kv-row{ display:flex; justify-content:space-between; gap: 10px; padding: 10px 12px; border-bottom:1px solid var(--ribo-border); }
+.ribo-kv-row:last-child{ border-bottom:0; }
+.ribo-kv-key{ color: var(--ribo-muted); font-weight:700; }
+.ribo-kv-val{ color: var(--ribo-text); font-weight:700; }
+
+.ribo-callout{ border:1px solid #fecaca; background:#fff1f2; border-radius: 12px; padding: 10px 12px; }
+.ribo-callout-title{ font-weight: 800; margin-bottom: 6px; color:#9f1239; }
+
+.ribo-name-wrap{
+  display:inline-block;
+  white-space:pre-line;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+  line-height:1.45;
+  max-width:20ch;
+}
+
+.ribo-table td:first-child{
+  width:20ch;
+  min-width:20ch;
+  vertical-align:top;
+}
